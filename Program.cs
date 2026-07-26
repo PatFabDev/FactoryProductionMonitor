@@ -4,6 +4,8 @@
     {
         bool running = true;
 
+        Database.InitializeDatabase();
+
         List<Production> productions = new List<Production>();
 
         while (running)
@@ -38,19 +40,19 @@
         switch (input)
         {
             case "1":
-                ShowProduction(productions);
+                ShowProduction();
                 return true;
 
             case "2":
-                AddProduction(productions);
+                AddProduction();
                 return true;
 
             case "3":
-                UpdateProduction(productions);
+                UpdateProduction();
                 return true;
 
             case "4":
-                DeleteProduction(productions);
+                DeleteProduction();
                 return true;
 
             case "5":
@@ -63,8 +65,10 @@
         }
     }
 
-    static void ShowProduction(List<Production> productions)
+    static void ShowProduction()
     {
+        List<Production> productions = Database.GetProductions();
+
         if (productions.Count == 0)
         {
             Console.WriteLine("No productions available.");
@@ -82,90 +86,96 @@
         }
     }
 
-    static void AddProduction(List<Production> productions)
+    static void AddProduction()
     {
         Console.WriteLine("Adding production...");
         Console.Write("Machine: ");
         string? machine = Console.ReadLine();
+
         Console.Write("Product: ");
         string? product = Console.ReadLine();
+
         Console.Write("Quantity: ");
         int quantity = int.TryParse(Console.ReadLine(), out int parsedQuantity) ? parsedQuantity : 0;
 
         Production production = new Production
         {
-            Id = productions.Count + 1,
             Machine = machine ?? "",
             Product = product ?? "",
             Quantity = quantity
         };
 
-        productions.Add(production);
+        Database.AddProduction(production);
     }
 
-    static Production? FindProductionById(List<Production> productions, int id)
+    static void DeleteProduction()
     {
-        foreach (Production production in productions)
-        {
-            if (production.Id == id)
-            {
-                return production;
-            }
-        }
-
-        return null;
-    }
-
-    static void DeleteProduction(List<Production> productions)
-    {
-        if (productions.Count == 0)
-        {
-            Console.WriteLine("No productions available.");
-            return;
-        }
-
         Console.Write("Enter the ID of the production to delete: ");
         int id = int.TryParse(Console.ReadLine(), out int parsedId) ? parsedId : 0;
 
-        Production? productionToRemove = FindProductionById(productions, id);
+        Production? production = Database.GetProductionById(id);
 
-        if (productionToRemove != null)
+        if (production == null)
         {
-            productions.Remove(productionToRemove);
-            Console.WriteLine($"Production with ID {id} deleted.");
-        }
-        else
-        {
-            Console.WriteLine($"Production ID {id} not found.");
-        }
-    }
-
-    static void UpdateProduction(List<Production> productions)
-    {
-        if (productions.Count == 0)
-        {
-            Console.WriteLine("No productions available.");
+            Console.WriteLine("Production not found.");
             return;
         }
 
+        Console.WriteLine($"Machine : {production.Machine}");
+        Console.WriteLine($"Product : {production.Product}");
+        Console.WriteLine($"Quantity: {production.Quantity}");
+
+        Console.Write("Delete this production? (y/n): ");
+        string? answer = Console.ReadLine();
+
+        if (answer?.ToLower() != "y")
+        {
+            Console.WriteLine("Deletion cancelled.");
+            return;
+        }
+
+        Database.DeleteProduction(id);
+        Console.WriteLine($"Production with ID {id} deleted.");
+    }
+
+    static void UpdateProduction()
+    {
         Console.Write("Enter the ID of the production to update: ");
         int id = int.TryParse(Console.ReadLine(), out int parsedId) ? parsedId : 0;
 
-        Production? productionToUpdate = FindProductionById(productions, id);
+        Production? production = Database.GetProductionById(id);
 
-        if (productionToUpdate == null)
+        if (production == null)
         {
-            Console.WriteLine($"Production ID {id} not found.");
+            Console.WriteLine("Production not found.");
             return;
         }
 
-        Console.Write("Machine: ");
-        productionToUpdate.Machine = Console.ReadLine() ?? "";
-        Console.Write("Product: ");
-        productionToUpdate.Product = Console.ReadLine() ?? "";
-        Console.Write("Quantity: ");
-        productionToUpdate.Quantity = int.TryParse(Console.ReadLine(), out int parsedQuantity) ? parsedQuantity : 0;
+        Console.WriteLine($"Current machine : {production.Machine}");
+        Console.WriteLine($"Current product : {production.Product}");
+        Console.WriteLine($"Current quantity: {production.Quantity}");
 
-        Console.WriteLine($"Production with ID {id} updated.");
+        Console.Write($"Machine ({production.Machine}): ");
+        string? machine = Console.ReadLine();
+
+        production.Machine = string.IsNullOrWhiteSpace(machine)
+            ? production.Machine
+            : machine;
+
+        Console.Write($"Product ({production.Product}): ");
+        string? product = Console.ReadLine();
+
+        production.Product = string.IsNullOrWhiteSpace(product)
+            ? production.Product
+            : product;
+
+        Console.Write($"Quantity ({production.Quantity}): ");
+        string? quantityInput = Console.ReadLine();
+
+        production.Quantity = int.TryParse(quantityInput, out int parsedQuantity)
+            ? parsedQuantity
+            : production.Quantity;
+
+        Database.UpdateProduction(production);
     }
 }
