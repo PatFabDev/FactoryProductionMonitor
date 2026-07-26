@@ -129,4 +129,21 @@ WHERE Id = @id;
 
         command.ExecuteNonQuery();
     }
+
+    public static void DeleteProduction(int id)
+    {
+        using var connection = new SqliteConnection("Data Source=production.db");
+
+        connection.Open();
+
+        string sql = @"
+DELETE FROM Productions
+WHERE Id = @id;
+";
+
+        using var command = new SqliteCommand(sql, connection);
+        command.Parameters.AddWithValue("@id", id);
+
+        command.ExecuteNonQuery();
+    }
 }

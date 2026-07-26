@@ -52,7 +52,7 @@
                 return true;
 
             case "4":
-                DeleteProduction(productions);
+                DeleteProduction();
                 return true;
 
             case "5":
@@ -108,41 +108,34 @@
         Database.AddProduction(production);
     }
 
-    static Production? FindProductionById(List<Production> productions, int id)
+    static void DeleteProduction()
     {
-        foreach (Production production in productions)
-        {
-            if (production.Id == id)
-            {
-                return production;
-            }
-        }
-
-        return null;
-    }
-
-    static void DeleteProduction(List<Production> productions)
-    {
-        if (productions.Count == 0)
-        {
-            Console.WriteLine("No productions available.");
-            return;
-        }
-
         Console.Write("Enter the ID of the production to delete: ");
         int id = int.TryParse(Console.ReadLine(), out int parsedId) ? parsedId : 0;
 
-        Production? productionToRemove = FindProductionById(productions, id);
+        Production? production = Database.GetProductionById(id);
 
-        if (productionToRemove != null)
+        if (production == null)
         {
-            productions.Remove(productionToRemove);
-            Console.WriteLine($"Production with ID {id} deleted.");
+            Console.WriteLine("Production not found.");
+            return;
         }
-        else
+
+        Console.WriteLine($"Machine : {production.Machine}");
+        Console.WriteLine($"Product : {production.Product}");
+        Console.WriteLine($"Quantity: {production.Quantity}");
+
+        Console.Write("Delete this production? (y/n): ");
+        string? answer = Console.ReadLine();
+
+        if (answer?.ToLower() != "y")
         {
-            Console.WriteLine($"Production ID {id} not found.");
+            Console.WriteLine("Deletion cancelled.");
+            return;
         }
+
+        Database.DeleteProduction(id);
+        Console.WriteLine($"Production with ID {id} deleted.");
     }
 
     static void UpdateProduction()
