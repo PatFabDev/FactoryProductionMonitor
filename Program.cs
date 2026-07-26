@@ -44,7 +44,7 @@
                 return true;
 
             case "2":
-                AddProduction(productions);
+                AddProduction();
                 return true;
 
             case "3":
@@ -84,25 +84,26 @@
         }
     }
 
-    static void AddProduction(List<Production> productions)
+    static void AddProduction()
     {
         Console.WriteLine("Adding production...");
         Console.Write("Machine: ");
         string? machine = Console.ReadLine();
+
         Console.Write("Product: ");
         string? product = Console.ReadLine();
+
         Console.Write("Quantity: ");
         int quantity = int.TryParse(Console.ReadLine(), out int parsedQuantity) ? parsedQuantity : 0;
 
         Production production = new Production
         {
-            Id = productions.Count + 1,
             Machine = machine ?? "",
             Product = product ?? "",
             Quantity = quantity
         };
 
-        productions.Add(production);
+        Database.AddProduction(production);
     }
 
     static Production? FindProductionById(List<Production> productions, int id)
