@@ -4,6 +4,8 @@
     {
         bool running = true;
 
+        Database.InitializeDatabase();
+
         List<Production> productions = new List<Production>();
 
         while (running)
