@@ -2,6 +2,9 @@
 bin/
 obj/
 
+# SQLite database
+*.db
+
 # Visual Studio
 .vs/
 
