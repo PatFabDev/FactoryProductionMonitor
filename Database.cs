@@ -40,4 +40,37 @@ VALUES (@machine, @product, @quantity);
 
         command.ExecuteNonQuery();
     }
+
+    public static List<Production> GetProductions()
+    {
+        List<Production> productions = new();
+
+        using var connection = new SqliteConnection("Data Source=production.db");
+
+        connection.Open();
+
+        string sql = @"
+SELECT Id, Machine, Product, Quantity
+FROM Productions;
+";
+
+        using var command = new SqliteCommand(sql, connection);
+
+        using var reader = command.ExecuteReader();
+
+        while (reader.Read())
+        {
+            Production production = new Production
+            {
+                Id = reader.GetInt32(0),
+                Machine = reader.GetString(1),
+                Product = reader.GetString(2),
+                Quantity = reader.GetInt32(3)
+            };
+
+            productions.Add(production);
+        }
+
+        return productions;
+    }
 }

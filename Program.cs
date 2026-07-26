@@ -40,7 +40,7 @@
         switch (input)
         {
             case "1":
-                ShowProduction(productions);
+                ShowProduction();
                 return true;
 
             case "2":
@@ -65,8 +65,10 @@
         }
     }
 
-    static void ShowProduction(List<Production> productions)
+    static void ShowProduction()
     {
+        List<Production> productions = Database.GetProductions();
+
         if (productions.Count == 0)
         {
             Console.WriteLine("No productions available.");
