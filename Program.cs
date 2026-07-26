@@ -48,7 +48,7 @@
                 return true;
 
             case "3":
-                UpdateProduction(productions);
+                UpdateProduction();
                 return true;
 
             case "4":
@@ -145,32 +145,44 @@
         }
     }
 
-    static void UpdateProduction(List<Production> productions)
+    static void UpdateProduction()
     {
-        if (productions.Count == 0)
-        {
-            Console.WriteLine("No productions available.");
-            return;
-        }
-
         Console.Write("Enter the ID of the production to update: ");
         int id = int.TryParse(Console.ReadLine(), out int parsedId) ? parsedId : 0;
 
-        Production? productionToUpdate = FindProductionById(productions, id);
+        Production? production = Database.GetProductionById(id);
 
-        if (productionToUpdate == null)
+        if (production == null)
         {
-            Console.WriteLine($"Production ID {id} not found.");
+            Console.WriteLine("Production not found.");
             return;
         }
 
-        Console.Write("Machine: ");
-        productionToUpdate.Machine = Console.ReadLine() ?? "";
-        Console.Write("Product: ");
-        productionToUpdate.Product = Console.ReadLine() ?? "";
-        Console.Write("Quantity: ");
-        productionToUpdate.Quantity = int.TryParse(Console.ReadLine(), out int parsedQuantity) ? parsedQuantity : 0;
+        Console.WriteLine($"Current machine : {production.Machine}");
+        Console.WriteLine($"Current product : {production.Product}");
+        Console.WriteLine($"Current quantity: {production.Quantity}");
 
-        Console.WriteLine($"Production with ID {id} updated.");
+        Console.Write($"Machine ({production.Machine}): ");
+        string? machine = Console.ReadLine();
+
+        production.Machine = string.IsNullOrWhiteSpace(machine)
+            ? production.Machine
+            : machine;
+
+        Console.Write($"Product ({production.Product}): ");
+        string? product = Console.ReadLine();
+
+        production.Product = string.IsNullOrWhiteSpace(product)
+            ? production.Product
+            : product;
+
+        Console.Write($"Quantity ({production.Quantity}): ");
+        string? quantityInput = Console.ReadLine();
+
+        production.Quantity = int.TryParse(quantityInput, out int parsedQuantity)
+            ? parsedQuantity
+            : production.Quantity;
+
+        Database.UpdateProduction(production);
     }
 }
